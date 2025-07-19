@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Plus, Send } from "lucide-react"
+import { Plus, Send, UserPlus, X } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface WorkLogEntry {
   id: number
@@ -43,29 +44,18 @@ export default function CreateProjectPage() {
   const [showAddForm, setShowAddForm] = useState(false)
 
   // Comments state
-  const [comments, setComments] = useState<Comment[]>([
-    {
-      id: 1,
-      author: "Suman Shrestha",
-      role: "supervisor",
-      content: "Great progress on the initial setup. Please make sure to document your API endpoints properly.",
-      timestamp: "2024-01-20 10:30 AM",
-    },
-    {
-      id: 2,
-      author: "Erika Shrestha",
-      role: "student",
-      content:
-        "Thank you for the feedback! I've updated the documentation and added more detailed comments in the code.",
-      timestamp: "2024-01-20 2:15 PM",
-    },
-  ])
+  const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState("")
 
   // Sample members data
   const [members, setMembers] = useState<Member[]>([
     { id: 1, name: "Current User", role: "student" }, // Default current user
   ])
+
+  // Add member form state
+  const [showAddMemberForm, setShowAddMemberForm] = useState(false)
+  const [newMemberName, setNewMemberName] = useState("")
+  const [newMemberRole, setNewMemberRole] = useState<"supervisor" | "student">("student")
 
   const handleAddWorkLog = () => {
     if (newDate && newTask) {
@@ -107,6 +97,41 @@ export default function CreateProjectPage() {
       e.preventDefault()
       handleAddComment()
     }
+  }
+
+  const handleAddMember = () => {
+    if (newMemberName.trim()) {
+      const newMember: Member = {
+        id: Date.now(),
+        name: newMemberName.trim(),
+        role: newMemberRole,
+      }
+      setMembers([...members, newMember])
+      setNewMemberName("")
+      setNewMemberRole("student")
+      setShowAddMemberForm(false)
+    }
+  }
+
+  const handleRemoveMember = (memberId: number) => {
+    if (window.confirm("Are you sure you want to remove this member from the project?")) {
+      setMembers(members.filter((member) => member.id !== memberId))
+    }
+  }
+
+  const handleAddUser = () => {
+    setShowAddMemberForm(!showAddMemberForm)
+  }
+
+  const handleCreateProject = () => {
+    // TODO: Implement project creation logic
+    console.log("Creating project with data:", {
+      name: projectName,
+      details: projectDetails,
+      members: members
+    })
+    // In real app, this would save the project and redirect
+    alert("Project created successfully!")
   }
 
   const supervisors = members.filter((member) => member.role === "supervisor")
@@ -164,7 +189,15 @@ export default function CreateProjectPage() {
                   <CardTitle className="text-base">Repository</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-gray-500 text-sm">No content...</div>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Project repository link"
+                      className="text-sm"
+                    />
+                    <Button variant="outline" size="sm" className="bg-transparent">
+                      📁 View repository
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -173,14 +206,16 @@ export default function CreateProjectPage() {
                   <CardTitle className="text-base">Proposal Status</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  <div className="space-y-2">
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800">
                       Upload Pending
                     </Badge>
-                    <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">
-                      <span className="mr-2">+</span>
-                      Add your work
-                    </Button>
+                    <div className="space-y-1">
+                      <Input type="file" accept=".pdf,.doc,.docx" className="text-xs" />
+                      <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                        Upload Proposal
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -351,41 +386,131 @@ export default function CreateProjectPage() {
       case "members":
         return (
           <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-900">Team Members</h3>
+              <Button
+                onClick={() => setShowAddMemberForm(!showAddMemberForm)}
+                className="bg-teal-600 hover:bg-teal-700"
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Add Users
+              </Button>
+            </div>
+
+            {/* Add Member Form */}
+            {showAddMemberForm && (
+              <Card className="bg-gray-50 border-2 border-teal-200">
+                <CardContent className="p-4">
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-gray-900">Add New Member</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <Input
+                          placeholder="Enter member name"
+                          value={newMemberName}
+                          onChange={(e) => setNewMemberName(e.target.value)}
+                          className="bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <Select
+                          value={newMemberRole}
+                          onValueChange={(value: "supervisor" | "student") => setNewMemberRole(value)}
+                        >
+                          <SelectTrigger className="bg-white">
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="student">Student</SelectItem>
+                            <SelectItem value="supervisor">Supervisor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="outline" onClick={() => setShowAddMemberForm(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleAddMember}
+                        disabled={!newMemberName.trim()}
+                        className="bg-teal-600 hover:bg-teal-700"
+                      >
+                        Add Member
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Supervisor Section */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">Supervisor</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Supervisor ({supervisors.length})
+              </h3>
               <div className="space-y-3">
-                {supervisors.map((supervisor) => (
-                  <div key={supervisor.id} className="flex items-center space-x-3">
-                    <Avatar className="w-10 h-10 bg-gray-300">
-                      <AvatarFallback className="text-gray-600 font-medium">
-                        {supervisor.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-gray-900 font-medium">{supervisor.name}</span>
+                {supervisors.length === 0 ? (
+                  <div className="flex items-center justify-center h-20 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <p className="text-gray-500 text-sm">No supervisor assigned yet</p>
                   </div>
-                ))}
+                ) : (
+                  supervisors.map((supervisor) => (
+                    <div key={supervisor.id} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="w-10 h-10 bg-gray-300">
+                          <AvatarFallback className="text-gray-600 font-medium">
+                            {supervisor.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-gray-900 font-medium">{supervisor.name}</span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveMember(supervisor.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
             {/* Students Section */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">Students</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                Students ({students.length})
+              </h3>
               <div className="space-y-3">
                 {students.map((student) => (
-                  <div key={student.id} className="flex items-center space-x-3">
-                    <Avatar className="w-10 h-10 bg-gray-300">
-                      <AvatarFallback className="text-gray-600 font-medium">
-                        {student.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-gray-900 font-medium">{student.name}</span>
+                  <div key={student.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="w-10 h-10 bg-gray-300">
+                        <AvatarFallback className="text-gray-600 font-medium">
+                          {student.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-gray-900 font-medium">{student.name}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveMember(student.id)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -399,9 +524,17 @@ export default function CreateProjectPage() {
 
   return (
     <Layout title="Create Project" userRole="Student">
-      <div className="max-w-4xl">
+      <div className="max-w-4xl relative">
         <ProjectTabs activeTab={activeTab} onTabChange={setActiveTab} userRole="Student" />
         {renderTabContent()}
+        
+        {/* Create Project Button - positioned at bottom right */}
+        <div className="fixed bottom-6 right-6">
+          <Button onClick={handleCreateProject} className="bg-teal-600 hover:bg-teal-700 shadow-lg">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Project
+          </Button>
+        </div>
       </div>
     </Layout>
   )
