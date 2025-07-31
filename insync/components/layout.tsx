@@ -53,11 +53,23 @@ export function Layout({ children, title, userRole = "Student" }: LayoutProps) {
         </div>
       </header>
 
+      {/* yha vanda mathi */}
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-48 bg-white border-r border-gray-200 min-h-screen p-4 relative">
-          {/* All navigation items at bottom */}
-          <div className="absolute bottom-20 left-4 right-4">
+              <div className="flex">
+        <aside className="w-48 bg-white border-gray-200 min-h-screen p-4 relative">
+              <Image 
+                            src="/image.png" 
+                            alt="InSync Logo" 
+                            width={200} 
+                            height={200}
+                            className="object-contain"
+                          />
+                        
+            </aside>
+          </div>
+          <div className="absolute bottom-30 left-4 right-4">
             <nav className="space-y-1">
               <Button
                 variant="ghost"
