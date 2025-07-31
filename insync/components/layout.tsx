@@ -57,7 +57,7 @@ export function Layout({ children, title, userRole = "Student" }: LayoutProps) {
         {/* Sidebar */}
         <aside className="w-48 bg-white border-r border-gray-200 min-h-screen p-4 relative">
           {/* All navigation items at bottom */}
-          <div className="absolute bottom-4 left-4 right-4">
+          <div className="absolute bottom-20 left-4 right-4">
             <nav className="space-y-1">
               <Button
                 variant="ghost"
