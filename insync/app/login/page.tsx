@@ -78,7 +78,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <div>
+            {/* <div>
               <Label htmlFor="role" className="text-sm text-gray-600 mb-2 block">
                 Select you role
               </Label>
@@ -91,7 +91,7 @@ export default function LoginPage() {
                   <SelectItem value="supervisor">Supervisor</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
           </form>
 
           <Button 
