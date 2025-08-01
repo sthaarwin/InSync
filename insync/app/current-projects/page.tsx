@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Layout } from "../../components/layout"
 import { Button } from "@/components/ui/button"
 import { Plus, MoreHorizontal, Archive, Trash2 } from "lucide-react"
@@ -70,29 +69,41 @@ function ProjectCardWithMenu({ title, semester, projectId, onArchive, onDelete }
 
 export default function CurrentProjectsPage() {
   const router = useRouter()
-  const [projects, setProjects] = useState([
-    { title: "Web Development Project", semester: "(2024/I)", projectId: "web-dev-2024" },
-    { title: "Machine Learning Model", semester: "(2024/I)", projectId: "ml-model-2024" },
-    { title: "Database Management", semester: "(2024/I)", projectId: "db-management-2024" },
-    { title: "Mobile App Development", semester: "(2024/I)", projectId: "mobile-app-2024" },
-  ])
+  const [projects, setProjects] = useState<any[]>([])
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const token = localStorage.getItem("token")
+
+        const res = await fetch("http://localhost:5000/api/projects", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        const data = await res.json()
+        setProjects(data)
+      } catch (err) {
+        console.error("Error fetching projects:", err)
+      }
+    }
+
+    fetchProjects()
+  }, [])
 
   const handleAddProject = () => {
     router.push("/create-project")
   }
 
   const handleArchiveProject = (projectId: string) => {
-    // Remove from current projects (in real app, this would move to archived projects)
-    setProjects(projects.filter((project) => project.projectId !== projectId))
-
-    // Show confirmation message (you can replace with a toast notification)
+    setProjects(projects.filter((project) => project.projectID !== projectId))
     alert(`Project archived successfully!`)
   }
 
   const handleDeleteProject = (projectId: string) => {
-    // Show confirmation dialog
     if (window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
-      setProjects(projects.filter((project) => project.projectId !== projectId))
+      setProjects(projects.filter((project) => project.projectID !== projectId))
       alert(`Project deleted successfully!`)
     }
   }
@@ -101,19 +112,18 @@ export default function CurrentProjectsPage() {
     <Layout title="Current Projects">
       <div className="space-y-6 relative">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {projects.map((project, index) => (
+          {projects.map((project) => (
             <ProjectCardWithMenu
-              key={index}
-              title={project.title}
-              semester={project.semester}
-              projectId={project.projectId}
+              key={project.projectID}
+              title={project.projectTitle}
+              semester={project.Semester}
+              projectId={String(project.projectID)}
               onArchive={handleArchiveProject}
               onDelete={handleDeleteProject}
             />
           ))}
         </div>
 
-        {/* Add Project Button - positioned at bottom right */}
         <div className="fixed bottom-6 right-6">
           <Button onClick={handleAddProject} className="bg-teal-600 hover:bg-teal-700 shadow-lg">
             <Plus className="w-4 h-4 mr-2" />
