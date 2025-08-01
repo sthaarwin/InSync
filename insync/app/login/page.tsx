@@ -1,20 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [role, setRole] = useState("")
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
 
-  const handleLogin = async () => {
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  cconst handleLogin = async () => {
   try {
     const res = await fetch("http://localhost:5000/api/login", {
       method: "POST",
@@ -46,62 +52,65 @@ export default function LoginPage() {
 };
 
 
+  if (!mounted) {
+    return null
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-100 to-teal-200 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md relative">
-        {/* Cloud Icon */}
-        <div className="absolute -right-4 top-8">
-          <div className="relative">
-            <div className="w-24 h-24 bg-teal-400 rounded-full opacity-80"></div>
-            <div className="w-20 h-20 bg-teal-400 rounded-full absolute -top-4 -left-4 opacity-90"></div>
-            <div className="w-16 h-16 bg-teal-500 rounded-full absolute top-2 left-2 opacity-100"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 border border-white rounded-full relative">
-                  <div className="absolute -top-1 -right-1 w-2 h-2 border border-white rounded-full"></div>
-                  <div className="absolute -bottom-1 -left-1 w-2 h-2 border border-white rounded-full"></div>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-teal-200 via-teal-100 to-blue-100 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-3xl relative">
+        <div className="absolute right-15 top-1/2 -translate-y-1/2">
+          <div className="w-64 h-64 bg-white  flex items-center justify-center overflow-hidden border-gray-100">
+            <Image 
+              src="/image.png" 
+              alt="InSync Logo" 
+              width={200} 
+              height={200}
+              className="object-contain"
+            />
           </div>
         </div>
 
-        <div className="space-y-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Login</h1>
+        <div className="space-y-6 max-w-md">
+          <h1 className="text-xl font-semibold text-gray-800">Login</h1>
 
-          <div className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-4">
             <div>
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm text-gray-600 mb-2 block">
                 Email Address
               </Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 bg-gray-50 border-gray-200"
+                className="w-full h-10 px-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-w-sm"
+                autoComplete="email"
               />
             </div>
 
             <div>
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="password" className="text-sm text-gray-600 mb-2 block">
                 Password
               </Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 bg-gray-50 border-gray-200"
+                className="w-full h-10 px-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-w-sm"
+                autoComplete="current-password"
               />
             </div>
 
-            <div>
-              <Label htmlFor="role" className="text-sm font-medium text-gray-700">
+            {/* <div>
+              <Label htmlFor="role" className="text-sm text-gray-600 mb-2 block">
                 Select you role
               </Label>
               <Select value={role} onValueChange={setRole}>
-                <SelectTrigger className="mt-1 bg-gray-50 border-gray-200">
+                <SelectTrigger className="w-full h-10 px-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent max-w-sm">
                   <SelectValue placeholder="Select your role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -109,20 +118,24 @@ export default function LoginPage() {
                   <SelectItem value="supervisor">Supervisor</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-          </div>
+            </div> */}
+          </form>
 
-          <Button onClick={handleLogin} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg">
+          <Button 
+            onClick={handleLogin} 
+            className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors max-w-sm"
+            type="button"
+          >
             Login
           </Button>
 
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-2 max-w-sm">
             <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
-              Forgot password?
+              Forgot Password?
             </Link>
             <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
-              <Link href="/signup" className="text-blue-600 hover:underline">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="text-blue-600 hover:underline font-medium">
                 Sign Up
               </Link>
             </p>

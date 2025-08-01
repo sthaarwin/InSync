@@ -3,8 +3,9 @@
 import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Cloud, Archive, Settings } from "lucide-react"
+import { Archive, Settings } from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
+import Image from "next/image"
 
 interface LayoutProps {
   children: React.ReactNode
@@ -30,8 +31,14 @@ export function Layout({ children, title, userRole = "Student" }: LayoutProps) {
       <header className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center">
-              <Cloud className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+              <Image 
+                src="/image.png" 
+                alt="InSync Logo" 
+                width={40} 
+                height={40}
+                className="object-contain"
+              />
             </div>
             <div>
               <h1 className="text-lg font-semibold text-gray-900">InSync</h1>
@@ -46,11 +53,23 @@ export function Layout({ children, title, userRole = "Student" }: LayoutProps) {
         </div>
       </header>
 
+      {/* yha vanda mathi */}
       <div className="flex">
         {/* Sidebar */}
         <aside className="w-48 bg-white border-r border-gray-200 min-h-screen p-4 relative">
-          {/* All navigation items at bottom */}
-          <div className="absolute bottom-4 left-4 right-4">
+              <div className="flex">
+        <aside className="w-48 bg-white border-gray-200 min-h-screen p-4 relative">
+              <Image 
+                            src="/image.png" 
+                            alt="InSync Logo" 
+                            width={200} 
+                            height={200}
+                            className="object-contain"
+                          />
+                        
+            </aside>
+          </div>
+          <div className="absolute bottom-30 left-4 right-4">
             <nav className="space-y-1">
               <Button
                 variant="ghost"
