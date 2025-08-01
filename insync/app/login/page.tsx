@@ -14,10 +14,37 @@ export default function LoginPage() {
   const [role, setRole] = useState("")
   const router = useRouter()
 
-  const handleLogin = () => {
-    // Redirect directly to current projects without validation
-    router.push("/current-projects")
+  const handleLogin = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      alert(errorData.error || "Login failed");
+      return;
+    }
+
+    const data = await res.json();
+
+    if (data.message === "Login successful") {
+      // Redirect to the single dashboard
+      router.push("/Dashboard");
+    } else {
+      // Show error if login failed
+      alert("Login failed");
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Something went wrong. Please try again.");
   }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-100 to-teal-200 flex items-center justify-center p-4">
